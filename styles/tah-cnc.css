@@ -1,0 +1,19 @@
+/**
+ * @file tah-cnc.css
+ * @description Custom styles for the Token Action HUD Castles & Crusades module.
+ * @author FistanRaist
+ * @version 1.0.0
+ * @license MIT License - See LICENSE file for details
+ */
+
+/* Apply the Signika font to all groups for consistent styling */
+.tah-group {
+    font-family: "Signika", sans-serif;
+}
+
+/* Style for info text (e.g., bonuses or values) to ensure readability */
+.tah-info1 {
+    font-size: 14px !important; /* Force font size for consistency */
+    vertical-align: middle; /* Align text vertically with icons */
+    margin-left: 5px; /* Small spacing from the icon */
+}
