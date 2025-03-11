@@ -17,6 +17,7 @@
     },
     "esmodules": ["module.js"],
     "styles": ["styles/tah-cnc.css"],
-    "url": "https://github.com/FistanRaist/fvtt-token-action-hud-castles-and-crusades"
+    "url": "https://github.com/FistanRaist/fvtt-token-action-hud-castles-and-crusades",
+    "manifest": "https://github.com/FistanRaist/fvtt-token-action-hud-castles-and-crusades/blob/v1.0.0/module.json"
   }
 
