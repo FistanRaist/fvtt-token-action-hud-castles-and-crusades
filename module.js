@@ -2,7 +2,7 @@
  * @file module.js
  * @description Custom Token Action HUD integration for the Castles & Crusades system.
  * @author FistanRaist
- * @version 1.0.0
+ * @version 1.0.1
  * @license MIT License - See LICENSE file for details
  * @module fvtt-token-action-hud-castles-and-crusades
  * @requires token-action-hud-core@2.0
@@ -238,21 +238,31 @@ Hooks.once("tokenActionHudCoreApiReady", async (coreModule) => {
     }
 
     /**
-     * Determines the weapon type based on name and range.
+     * Determines the weapon type based on the range field.
      * @param {Object} weapon - The weapon item object
      * @returns {string} "melee", "ranged", or "both"
      */
     #determineWeaponType(weapon) {
-      if (!weapon?.name || !weapon.system) return "melee";
-      const name = weapon.name.toLowerCase();
+      if (!weapon?.system) return "melee";
+
+      // Get the range value and convert to lowercase for consistency
       const range = weapon.system.range?.value?.toLowerCase() || "";
-      const rangedOnly = ["bow", "crossbow", "sling"];
-      const throwable = ["dagger", "handaxe", "spear", "hammer", "javelin", "axe"];
-      if (rangedOnly.some((w) => name.includes(w))) return "ranged";
-      if (throwable.some((w) => name.includes(w)) || range.includes("thrown"))
-        return "both";
-      if (range.includes("ft") && !range.includes("thrown")) return "ranged";
-      return "melee";
+      if (!range) return "melee"; // Default to melee if range is empty
+
+      // Check for "melee" in the range field
+      const hasMelee = range.includes("melee");
+      // Check for a number in the range field using regex (e.g., "80", "30")
+      const hasNumber = /\d+/.test(range);
+
+      if (hasMelee && hasNumber) {
+        return "both"; // Both "melee" and a number (e.g., "Melee, 80 ft")
+      } else if (hasMelee) {
+        return "melee"; // Only "melee" (e.g., "Melee")
+      } else if (hasNumber) {
+        return "ranged"; // Only a number (e.g., "80 ft")
+      }
+
+      return "melee"; // Default to melee if neither condition is met
     }
 
     /**

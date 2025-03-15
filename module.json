@@ -2,8 +2,10 @@
     "id": "fvtt-token-action-hud-castles-and-crusades",
     "title": "Token Action HUD Castles & Crusades",
     "description": "TAH addon for Castles & Crusades ruleset",
-    "version": "1.0.0",
-    "author": "FistanRaist",
+    "version": "1.0.1",
+    "authors": {
+      "name": "FistanRaist"
+    },
     "compatibility": {
       "minimum": "12",
       "verified": "12"
@@ -19,6 +21,6 @@
     "styles": ["styles/tah-cnc.css"],
     "url": "https://github.com/FistanRaist/fvtt-token-action-hud-castles-and-crusades",
     "manifest": "https://raw.githubusercontent.com/FistanRaist/fvtt-token-action-hud-castles-and-crusades/refs/heads/main/module.json",
-    "download": "https://github.com/FistanRaist/fvtt-token-action-hud-castles-and-crusades/releases/download/v1.0.0/fvtt-token-action-hud-castles-and-crusades.zip"
+    "download": "https://github.com/FistanRaist/fvtt-token-action-hud-castles-and-crusades/releases/download/v1.0.1/fvtt-token-action-hud-castles-and-crusades.zip"
   }
 

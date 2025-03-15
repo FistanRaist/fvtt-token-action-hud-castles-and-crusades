@@ -15,3 +15,7 @@ A custom integration for the Token Action HUD to enhance gameplay with the Castl
 ## Credits
 - Customized by FistanRaist to work within the Castles & Crusades system.
 This is an addon for the [Token Action HUD Core](https://github.com/Larkinabout/fvtt-token-action-hud-core) module.
+
+## Version
+1.0.0 - Initial commit
+1.0.1 - Fixed the way TAHC&C parses weapons for melee/ranged/both; fixed module.json error (author to authors)
