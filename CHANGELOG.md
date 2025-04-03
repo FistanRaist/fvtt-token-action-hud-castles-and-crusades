@@ -9,3 +9,7 @@
 ## [1.0.1] - 2025-03-15
 - Fixed the parsing method for weapons so that all options display correctly (melee/ranged/both).
 - Changed author to authors in module.json to fix minor load error.
+
+## [1.0.2] - 2025-04-03
+- Fixed an inadvertent break to damage formulas for melee weapons - now properly adds Strength bonus to melee damage and the damage of "thrown" weapons.
+- Fixed comment typos.
