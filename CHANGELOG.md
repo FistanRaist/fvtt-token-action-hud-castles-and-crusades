@@ -13,3 +13,7 @@
 ## [1.0.2] - 2025-04-03
 - Fixed an inadvertent break to damage formulas for melee weapons - now properly adds Strength bonus to melee damage and the damage of "thrown" weapons.
 - Fixed comment typos.
+
+## [1.0.3] - 2025-04-04
+- Repaired attack rolls to add BtH for actors. 
+- Added additional flavor to damage rolls to display the formula used.

@@ -2,7 +2,7 @@
  * @file module.js
  * @description Custom Token Action HUD integration for the Castles & Crusades system.
  * @author FistanRaist
- * @version 1.0.2
+ * @version 1.0.3
  * @license MIT License - See LICENSE file for details
  * @module fvtt-token-action-hud-castles-and-crusades
  * @requires token-action-hud-core@2.0
@@ -697,7 +697,7 @@ async #rollWeapon(actor, actionId, rollMode, attackType) {
   const isMelee = attackType === "melee";
   let attackParts = ["1d20"];
   let rollData = {};
-  const attackBonus = actor.type === "monster" ? parseInt(String(system.attackBonus?.value || 0)) : 0;
+  const attackBonus = parseInt(String(system.attackBonus?.value || 0));
   if (attackBonus) {
     attackParts.push(`${attackBonus}`);
     rollData.attackBonus = attackBonus;
@@ -730,6 +730,7 @@ async #rollWeapon(actor, actionId, rollMode, attackType) {
     rollData.weaponBonus = weaponBonus;
   }
   const attackFormula = attackParts.join(" + ");
+  console.log(`Attack roll formula: ${attackFormula}`);
   const attackRoll = new Roll(attackFormula, rollData);
   let attackFlavor = `Roll: <b>${isMelee ? "Melee Attack" : "Ranged Attack"} → ${weapon.name}</b>`;
   if (game.settings.get("castles-and-crusades", "showDetailedFormulas")) {
@@ -743,11 +744,20 @@ async #rollWeapon(actor, actionId, rollMode, attackType) {
   if (weapon.system.damage.value) {
     let damageFormula = weapon.system.damage.value;
     const strMod = actor.type === "character" ? (system.abilities.str?.bonus || 0) : 0;
+    console.log(`Weapon type: ${this.action.system.weaponType}, isMelee: ${isMelee}, strMod: ${strMod}, abilityUsed: ${abilityUsed}, abilityMod: ${abilityMod}`);
     if ((isMelee && actor.type === "character" && abilityUsed === "STR" && abilityMod !== 0) || (this.action.system.weaponType === "both" && actor.type === "character" && strMod !== 0)) {
       damageFormula = `${damageFormula} + ${this.action.system.weaponType === "both" ? strMod : abilityMod}`;
     }
     const damageRoll = new Roll(damageFormula, actor.getRollData());
-    await damageRoll.toMessage({ speaker: ChatMessage.getSpeaker({ actor }), flavor: `${weapon.name} Damage`, rollMode });
+    let damageFlavor = `${weapon.name} Damage`;
+    if (game.settings.get("castles-and-crusades", "showDetailedFormulas")) {
+      const detailedDamageParts = [weapon.system.damage.value];
+      if ((isMelee && actor.type === "character" && abilityUsed === "STR" && abilityMod !== 0) || (this.action.system.weaponType === "both" && actor.type === "character" && strMod !== 0)) {
+        detailedDamageParts.push(this.action.system.weaponType === "both" ? "@abilities.str.bonus" : `@abilities.${abilityUsed.toLowerCase()}.bonus`);
+      }
+      damageFlavor += `<br><em>(${detailedDamageParts.join(" + ")})</em>`;
+    }
+    await damageRoll.toMessage({ speaker: ChatMessage.getSpeaker({ actor }), flavor: damageFlavor, rollMode });
   }
 }
 
