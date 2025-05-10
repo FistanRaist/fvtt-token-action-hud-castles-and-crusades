@@ -2,7 +2,7 @@
  * @file module.js
  * @description Custom Token Action HUD integration for the Castles & Crusades system.
  * @author FistanRaist
- * @version 1.0.3
+ * @version 1.0.4
  * @license MIT License - See LICENSE file for details
  * @module fvtt-token-action-hud-castles-and-crusades
  * @requires token-action-hud-core@2.0
@@ -58,7 +58,7 @@ Hooks.once("tokenActionHudCoreApiReady", async (coreModule) => {
    * @property {string} ranged - Bow icon for ranged attacks
    * @property {string} rollable - D20 icon for rollable actions
    * @property {string} shield - Shield icon for armor
-   * @property {string} hitDice - D20 icon for hit dice (previously skull, now d20)
+   * @property {string} hitDice - D20 icon for hit dice
    * @property {string} saves - Shield-alt icon for saves
    * @property {string} number - Users icon for number appearing
    */
@@ -187,55 +187,55 @@ Hooks.once("tokenActionHudCoreApiReady", async (coreModule) => {
       console.log("Attributes added:", actions);
     }
 
-/**
- * Builds combat actions for character actors.
- * @returns {Promise<void>}
- */
-async #buildCombat() {
-  const actions = [
-    { id: "initiative", name: "Initiative", icon1: ICONS.rollable, system: { actionType: "combat", actionId: "initiative" } },
-  ];
-  const weapons = this.items.filter((item) => item.type === "weapon");
-  weapons.forEach((weapon) => {
-    const weaponType = this.#determineWeaponType(weapon);
-    console.log(`Weapon: ${weapon.name}, Type: ${weaponType}, Damage: ${weapon.system.damage.value}`);
-    if (weaponType === "melee") {
-      actions.push({
-        id: `weapon-${weapon._id}-melee`,
-        name: weapon.name,
-        icon1: ICONS.melee,
-        info1: { text: weapon.system.damage.value || "" },
-        system: { actionType: "weapon", actionId: weapon._id, attackType: "melee", weaponType: weaponType },
+    /**
+     * Builds combat actions for character actors.
+     * @returns {Promise<void>}
+     */
+    async #buildCombat() {
+      const actions = [
+        { id: "initiative", name: "Initiative", icon1: ICONS.rollable, system: { actionType: "combat", actionId: "initiative" } },
+      ];
+      const weapons = this.items.filter((item) => item.type === "weapon");
+      weapons.forEach((weapon) => {
+        const weaponType = this.#determineWeaponType(weapon);
+        console.log(`Weapon: ${weapon.name}, Type: ${weaponType}, Damage: ${weapon.system.damage.value}`);
+        if (weaponType === "melee") {
+          actions.push({
+            id: `weapon-${weapon._id}-melee`,
+            name: weapon.name,
+            icon1: ICONS.melee,
+            info1: { text: weapon.system.damage.value || "" },
+            system: { actionType: "weapon", actionId: weapon._id, attackType: "melee", weaponType: weaponType },
+          });
+        } else if (weaponType === "ranged") {
+          actions.push({
+            id: `weapon-${weapon._id}-ranged`,
+            name: weapon.name,
+            icon1: ICONS.ranged,
+            info1: { text: weapon.system.damage.value || "" },
+            system: { actionType: "weapon", actionId: weapon._id, attackType: "ranged", weaponType: weaponType },
+          });
+        } else if (weaponType === "both") {
+          actions.push({
+            id: `weapon-${weapon._id}-melee`,
+            name: weapon.name,
+            icon1: ICONS.melee,
+            info1: { text: weapon.system.damage.value || "" },
+            system: { actionType: "weapon", actionId: weapon._id, attackType: "melee", weaponType: weaponType },
+          });
+          actions.push({
+            id: `weapon-${weapon._id}-ranged`,
+            name: weapon.name,
+            icon1: ICONS.ranged,
+            info1: { text: weapon.system.damage.value || "" },
+            system: { actionType: "weapon", actionId: weapon._id, attackType: "ranged", weaponType: weaponType },
+          });
+        }
       });
-    } else if (weaponType === "ranged") {
-      actions.push({
-        id: `weapon-${weapon._id}-ranged`,
-        name: weapon.name,
-        icon1: ICONS.ranged,
-        info1: { text: weapon.system.damage.value || "" },
-        system: { actionType: "weapon", actionId: weapon._id, attackType: "ranged", weaponType: weaponType },
-      });
-    } else if (weaponType === "both") {
-      actions.push({
-        id: `weapon-${weapon._id}-melee`,
-        name: weapon.name,
-        icon1: ICONS.melee,
-        info1: { text: weapon.system.damage.value || "" },
-        system: { actionType: "weapon", actionId: weapon._id, attackType: "melee", weaponType: weaponType },
-      });
-      actions.push({
-        id: `weapon-${weapon._id}-ranged`,
-        name: weapon.name,
-        icon1: ICONS.ranged,
-        info1: { text: weapon.system.damage.value || "" },
-        system: { actionType: "weapon", actionId: weapon._id, attackType: "ranged", weaponType: weaponType },
-      });
+      console.log("Combat actions built:", JSON.stringify(actions, null, 2));
+      this.addActions(actions, { id: "combat", name: "Combat", type: "system" });
+      console.log("Combat actions added:", actions);
     }
-  });
-  console.log("Combat actions built:", JSON.stringify(actions, null, 2));
-  this.addActions(actions, { id: "combat", name: "Combat", type: "system" });
-  console.log("Combat actions added:", actions);
-}
 
     /**
      * Determines the weapon type based on the range field.
@@ -337,93 +337,93 @@ async #buildCombat() {
     }
 
     // Monster-specific methods
-/**
- * Builds combat actions for monster actors.
- * @returns {Promise<void>}
- */
-async #buildMonsterCombat() {
-  console.log("Building monster combat actions");
-  const actions = [
-    {
-      id: "initiative",
-      name: "Initiative",
-      icon1: ICONS.rollable, // D20 icon for initiative rolls
-      system: { actionType: "combat", actionId: "initiative" },
-    },
-    {
-      id: "hitDice",
-      name: "Hit Dice",
-      icon1: ICONS.rollable, // D20 icon for hit dice
-      info1: {
-        text: `${this.actor.system.hitDice.number}${this.actor.system.hitDice.size}${this.actor.system.hitDice.mod >= 0 ? "+" : ""}${this.actor.system.hitDice.mod}`,
-      },
-      system: { actionType: "monsterCombat", actionId: "hitDice" },
-    },
-    {
-      id: "monsterSaves",
-      name: "Monster Saves",
-      icon1: ICONS.saves, // Shield-alt icon for saves
-      info1: { text: this.actor.system.msaves.value === "M, P" ? "B" : this.actor.system.msaves.value || "N/A" },
-      tooltip: this.actor.system.msaves.value === "M, P" ? "Mental and Physical" : this.actor.system.msaves.value || "N/A",
-      system: { actionType: "monsterCombat", actionId: "monsterSaves" },
-    },
-    {
-      id: "ac",
-      name: "Armor Class",
-      info1: { text: this.actor.system.armorClass.value || "N/A" },
-      system: { actionType: "monsterCombat", actionId: "ac" },
-    },
-    {
-      id: "baseToHit",
-      name: "Base to Hit",
-      info1: { text: this.actor.system.attackBonus.value ? `+${this.actor.system.attackBonus.value}` : "N/A" },
-      system: { actionType: "monsterCombat", actionId: "baseToHit" },
-    },
-  ];
+    /**
+     * Builds combat actions for monster actors.
+     * @returns {Promise<void>}
+     */
+    async #buildMonsterCombat() {
+      console.log("Building monster combat actions");
+      const actions = [
+        {
+          id: "initiative",
+          name: "Initiative",
+          icon1: ICONS.rollable, // D20 icon for initiative rolls
+          system: { actionType: "combat", actionId: "initiative" },
+        },
+        {
+          id: "hitDice",
+          name: "Hit Dice",
+          icon1: ICONS.rollable, // D20 icon for hit dice
+          info1: {
+            text: `${this.actor.system.hitDice.number}${this.actor.system.hitDice.size}${this.actor.system.hitDice.mod >= 0 ? "+" : ""}${this.actor.system.hitDice.mod}`,
+          },
+          system: { actionType: "monsterCombat", actionId: "hitDice" },
+        },
+        {
+          id: "monsterSaves",
+          name: "Monster Saves",
+          icon1: ICONS.saves, // Shield-alt icon for saves
+          info1: { text: this.actor.system.msaves.value === "M, P" ? "B" : this.actor.system.msaves.value || "N/A" },
+          tooltip: this.actor.system.msaves.value === "M, P" ? "Mental and Physical" : this.actor.system.msaves.value || "N/A",
+          system: { actionType: "monsterCombat", actionId: "monsterSaves" },
+        },
+        {
+          id: "ac",
+          name: "Armor Class",
+          info1: { text: this.actor.system.armorClass.value || "N/A" },
+          system: { actionType: "monsterCombat", actionId: "ac" },
+        },
+        {
+          id: "baseToHit",
+          name: "Base to Hit",
+          info1: { text: this.actor.system.attackBonus.value ? `+${this.actor.system.attackBonus.value}` : "N/A" },
+          system: { actionType: "monsterCombat", actionId: "baseToHit" },
+        },
+      ];
 
-  // Add weapons from the monster's items
-  const weapons = this.items.filter((item) => item.type === "weapon");
-  weapons.forEach((weapon) => {
-    const weaponType = this.#determineWeaponType(weapon);
-    console.log(`Monster Weapon: ${weapon.name}, Type: ${weaponType}, Damage: ${weapon.system.damage.value}, ID: ${weapon._id}`);
-    if (weaponType === "melee") {
-      actions.push({
-        id: `weapon-${weapon._id}`,
-        name: weapon.name,
-        icon1: ICONS.melee,
-        info1: { text: weapon.system.damage.value || "" },
-        system: { actionType: "weapon", actionId: weapon._id, attackType: "melee", weaponType: weaponType },
+      // Add weapons from the monster's items
+      const weapons = this.items.filter((item) => item.type === "weapon");
+      weapons.forEach((weapon) => {
+        const weaponType = this.#determineWeaponType(weapon);
+        console.log(`Monster Weapon: ${weapon.name}, Type: ${weaponType}, Damage: ${weapon.system.damage.value}, ID: ${weapon._id}`);
+        if (weaponType === "melee") {
+          actions.push({
+            id: `weapon-${weapon._id}`,
+            name: weapon.name,
+            icon1: ICONS.melee,
+            info1: { text: weapon.system.damage.value || "" },
+            system: { actionType: "weapon", actionId: weapon._id, attackType: "melee", weaponType: weaponType },
+          });
+        } else if (weaponType === "ranged") {
+          actions.push({
+            id: `weapon-${weapon._id}`,
+            name: weapon.name,
+            icon1: ICONS.ranged,
+            info1: { text: weapon.system.damage.value || "" },
+            system: { actionType: "weapon", actionId: weapon._id, attackType: "ranged", weaponType: weaponType },
+          });
+        } else if (weaponType === "both") {
+          actions.push({
+            id: `weapon-${weapon._id}-melee`,
+            name: weapon.name,
+            icon1: ICONS.melee,
+            info1: { text: weapon.system.damage.value || "" },
+            system: { actionType: "weapon", actionId: weapon._id, attackType: "melee", weaponType: weaponType },
+          });
+          actions.push({
+            id: `weapon-${weapon._id}-ranged`,
+            name: weapon.name,
+            icon1: ICONS.ranged,
+            info1: { text: weapon.system.damage.value || "" },
+            system: { actionType: "weapon", actionId: weapon._id, attackType: "ranged", weaponType: weaponType },
+          });
+        }
       });
-    } else if (weaponType === "ranged") {
-      actions.push({
-        id: `weapon-${weapon._id}`,
-        name: weapon.name,
-        icon1: ICONS.ranged,
-        info1: { text: weapon.system.damage.value || "" },
-        system: { actionType: "weapon", actionId: weapon._id, attackType: "ranged", weaponType: weaponType },
-      });
-    } else if (weaponType === "both") {
-      actions.push({
-        id: `weapon-${weapon._id}-melee`,
-        name: weapon.name,
-        icon1: ICONS.melee,
-        info1: { text: weapon.system.damage.value || "" },
-        system: { actionType: "weapon", actionId: weapon._id, attackType: "melee", weaponType: weaponType },
-      });
-      actions.push({
-        id: `weapon-${weapon._id}-ranged`,
-        name: weapon.name,
-        icon1: ICONS.ranged,
-        info1: { text: weapon.system.damage.value || "" },
-        system: { actionType: "weapon", actionId: weapon._id, attackType: "ranged", weaponType: weaponType },
-      });
+
+      console.log("Monster combat actions built:", JSON.stringify(actions, null, 2));
+      this.addActions(actions, { id: "combat", name: "Combat", type: "system" });
+      console.log("Monster combat actions added:", actions);
     }
-  });
-
-  console.log("Monster combat actions built:", JSON.stringify(actions, null, 2));
-  this.addActions(actions, { id: "combat", name: "Combat", type: "system" });
-  console.log("Monster combat actions added:", actions);
-}
 
     /**
      * Builds spell actions for monster actors.
@@ -677,89 +677,82 @@ async #buildMonsterCombat() {
       });
     }
 
-/**
- * Rolls a weapon attack for the actor.
- * @param {Object} actor - The actor object
- * @param {string} actionId - The weapon ID
- * @param {string} rollMode - The roll mode
- * @param {string} attackType - The attack type (melee or ranged)
- * @returns {Promise<void>}
- */
-async #rollWeapon(actor, actionId, rollMode, attackType) {
-  console.log("Rolling weapon:", { actionId, attackType });
-  const weapon = actor.items.get(actionId);
-  if (!weapon) {
-    console.error(`Weapon with ID ${actionId} not found in actor ${actor.name}`);
-    ui.notifications.warn(`Weapon with ID ${actionId} not found.`);
-    return;
-  }
-  const system = actor.system;
-  const isMelee = attackType === "melee";
-  let attackParts = ["1d20"];
-  let rollData = {};
-  const attackBonus = parseInt(String(system.attackBonus?.value || 0));
-  if (attackBonus) {
-    attackParts.push(`${attackBonus}`);
-    rollData.attackBonus = attackBonus;
-  }
-  let abilityMod = 0;
-  let abilityUsed = "";
-  if (actor.type === "character") {
-    if (isMelee) {
-      if (["dagger", "rapier", "short sword"].some((w) => weapon.name.toLowerCase().includes(w))) {
-        const strMod = system.abilities.str?.bonus || 0;
-        const dexMod = system.abilities.dex?.bonus || 0;
-        abilityMod = Math.max(strMod, dexMod);
-        abilityUsed = abilityMod === strMod ? "STR" : "DEX";
-      } else {
-        abilityMod = system.abilities.str?.bonus || 0;
-        abilityUsed = "STR";
+    /**
+     * Rolls a weapon attack for the actor.
+     * @param {Object} actor - The actor object
+     * @param {string} actionId - The weapon ID
+     * @param {string} rollMode - The roll mode
+     * @param {string} attackType - The attack type (melee or ranged)
+     * @returns {Promise<void>}
+     */
+    async #rollWeapon(actor, actionId, rollMode, attackType) {
+      console.log("Rolling weapon:", { actionId, attackType });
+      const weapon = actor.items.get(actionId);
+      if (!weapon) {
+        console.error(`Weapon with ID ${actionId} not found in actor ${actor.name}`);
+        ui.notifications.warn(`Weapon with ID ${actionId} not found.`);
+        return;
       }
-    } else {
-      abilityMod = system.abilities.dex?.bonus || 0;
-      abilityUsed = "DEX";
-    }
-    if (abilityMod !== 0) {
-      attackParts.push(`${abilityMod}`);
-      rollData.abilityMod = abilityMod;
-    }
-  }
-  const weaponBonus = parseInt(String(weapon.system.bonusAb?.value || 0));
-  if (weaponBonus) {
-    attackParts.push(`${weaponBonus}`);
-    rollData.weaponBonus = weaponBonus;
-  }
-  const attackFormula = attackParts.join(" + ");
-  console.log(`Attack roll formula: ${attackFormula}`);
-  const attackRoll = new Roll(attackFormula, rollData);
-  let attackFlavor = `Roll: <b>${isMelee ? "Melee Attack" : "Ranged Attack"} → ${weapon.name}</b>`;
-  if (game.settings.get("castles-and-crusades", "showDetailedFormulas")) {
-    const detailedParts = ["1d20"];
-    if (attackBonus) detailedParts.push("@attackBonus");
-    if (abilityMod) detailedParts.push(`@abilities.${abilityUsed.toLowerCase()}.bonus`);
-    if (weaponBonus) detailedParts.push(`${weaponBonus}`);
-    attackFlavor += `<br><em>(${detailedParts.join(" + ")})</em>`;
-  }
-  await attackRoll.toMessage({ speaker: ChatMessage.getSpeaker({ actor }), flavor: attackFlavor, rollMode });
-  if (weapon.system.damage.value) {
-    let damageFormula = weapon.system.damage.value;
-    const strMod = actor.type === "character" ? (system.abilities.str?.bonus || 0) : 0;
-    console.log(`Weapon type: ${this.action.system.weaponType}, isMelee: ${isMelee}, strMod: ${strMod}, abilityUsed: ${abilityUsed}, abilityMod: ${abilityMod}`);
-    if ((isMelee && actor.type === "character" && abilityUsed === "STR" && abilityMod !== 0) || (this.action.system.weaponType === "both" && actor.type === "character" && strMod !== 0)) {
-      damageFormula = `${damageFormula} + ${this.action.system.weaponType === "both" ? strMod : abilityMod}`;
-    }
-    const damageRoll = new Roll(damageFormula, actor.getRollData());
-    let damageFlavor = `${weapon.name} Damage`;
-    if (game.settings.get("castles-and-crusades", "showDetailedFormulas")) {
-      const detailedDamageParts = [weapon.system.damage.value];
-      if ((isMelee && actor.type === "character" && abilityUsed === "STR" && abilityMod !== 0) || (this.action.system.weaponType === "both" && actor.type === "character" && strMod !== 0)) {
-        detailedDamageParts.push(this.action.system.weaponType === "both" ? "@abilities.str.bonus" : `@abilities.${abilityUsed.toLowerCase()}.bonus`);
+      const system = actor.system;
+      const isMelee = attackType === "melee";
+      let attackParts = ["1d20"];
+      let rollData = {};
+      const attackBonus = parseInt(String(system.attackBonus?.value || 0));
+      if (attackBonus) {
+        attackParts.push(`${attackBonus}`);
+        rollData.attackBonus = attackBonus;
       }
-      damageFlavor += `<br><em>(${detailedDamageParts.join(" + ")})</em>`;
+      let abilityMod = 0;
+      let abilityUsed = "";
+      if (actor.type === "character") {
+        if (isMelee) {
+          abilityMod = system.abilities.str?.bonus || 0;
+          abilityUsed = "STR";
+        } else {
+          abilityMod = system.abilities.dex?.bonus || 0;
+          abilityUsed = "DEX";
+        }
+        if (abilityMod !== 0) {
+          attackParts.push(`${abilityMod}`);
+          rollData.abilityMod = abilityMod;
+        }
+      }
+      const weaponBonus = parseInt(String(weapon.system.bonusAb?.value || 0));
+      if (weaponBonus) {
+        attackParts.push(`${weaponBonus}`);
+        rollData.weaponBonus = weaponBonus;
+      }
+      const attackFormula = attackParts.join(" + ");
+      console.log(`Attack roll formula: ${attackFormula}`);
+      const attackRoll = new Roll(attackFormula, rollData);
+      let attackFlavor = `Roll: <b>${isMelee ? "Melee Attack" : "Ranged Attack"} → ${weapon.name}</b>`;
+      if (game.settings.get("castles-and-crusades", "showDetailedFormulas")) {
+        const detailedParts = ["1d20"];
+        if (attackBonus) detailedParts.push("@attackBonus");
+        if (abilityMod) detailedParts.push(`@abilities.${abilityUsed.toLowerCase()}.bonus`);
+        if (weaponBonus) detailedParts.push(`${weaponBonus}`);
+        attackFlavor += `<br><em>(${detailedParts.join(" + ")})</em>`;
+      }
+      await attackRoll.toMessage({ speaker: ChatMessage.getSpeaker({ actor }), flavor: attackFlavor, rollMode });
+      if (weapon.system.damage.value) {
+        let damageFormula = weapon.system.damage.value;
+        const strMod = actor.type === "character" ? (system.abilities.str?.bonus || 0) : 0;
+        console.log(`Weapon type: ${this.action.system.weaponType}, isMelee: ${isMelee}, strMod: ${strMod}, abilityUsed: ${abilityUsed}, abilityMod: ${abilityMod}`);
+        if ((isMelee && actor.type === "character" && abilityMod !== 0) || (this.action.system.weaponType === "both" && actor.type === "character" && strMod !== 0)) {
+          damageFormula = `${damageFormula} + ${this.action.system.weaponType === "both" ? strMod : abilityMod}`;
+        }
+        const damageRoll = new Roll(damageFormula, actor.getRollData());
+        let damageFlavor = `${weapon.name} Damage`;
+        if (game.settings.get("castles-and-crusades", "showDetailedFormulas")) {
+          const detailedDamageParts = [weapon.system.damage.value];
+          if ((isMelee && actor.type === "character" && abilityMod !== 0) || (this.action.system.weaponType === "both" && actor.type === "character" && strMod !== 0)) {
+            detailedDamageParts.push(this.action.system.weaponType === "both" ? "@abilities.str.bonus" : `@abilities.${abilityUsed.toLowerCase()}.bonus`);
+          }
+          damageFlavor += `<br><em>(${detailedDamageParts.join(" + ")})</em>`;
+        }
+        await damageRoll.toMessage({ speaker: ChatMessage.getSpeaker({ actor }), flavor: damageFlavor, rollMode });
+      }
     }
-    await damageRoll.toMessage({ speaker: ChatMessage.getSpeaker({ actor }), flavor: damageFlavor, rollMode });
-  }
-}
 
     /**
      * Rolls a spell effect for the actor.
@@ -860,44 +853,44 @@ async #rollWeapon(actor, actionId, rollMode, attackType) {
     }
 
     /**
- * Rolls or displays a monster stat action (e.g., Number Appearing).
- * @param {Object} actor - The actor object
- * @param {string} actionId - The action ID
- * @param {string} rollMode - The roll mode
- * @returns {Promise<void>}
- */
-async #rollMonsterStats(actor, actionId, rollMode) {
-  if (actionId === "numberAppearing") {
-    const range = this.actor.system.numberAppearing.value;
-    let roll;
-    if (range.includes("-")) {
-      const [min, max] = range.split("-").map(Number);
-      roll = new Roll(`1d${max - min + 1} + ${min - 1}`);
-    } else {
-      roll = new Roll("1d1");
+     * Rolls or displays a monster stat action (e.g., Number Appearing).
+     * @param {Object} actor - The actor object
+     * @param {string} actionId - The action ID
+     * @param {string} rollMode - The roll mode
+     * @returns {Promise<void>}
+     */
+    async #rollMonsterStats(actor, actionId, rollMode) {
+      if (actionId === "numberAppearing") {
+        const range = this.actor.system.numberAppearing.value;
+        let roll;
+        if (range.includes("-")) {
+          const [min, max] = range.split("-").map(Number);
+          roll = new Roll(`1d${max - min + 1} + ${min - 1}`);
+        } else {
+          roll = new Roll("1d1");
+        }
+        await roll.toMessage({
+          speaker: ChatMessage.getSpeaker({ actor }),
+          flavor: `Number Appearing (${range})`,
+          rollMode,
+        });
+      } else {
+        const statMap = {
+          xp: "XP",
+          treasureType: "Treasure Type",
+          alignment: "Alignment",
+          size: "Size",
+          type: "Type",
+          intelligence: "Intelligence",
+        };
+        const statValue = actor.system[actionId === "intelligence" ? "monsterINT" : actionId].value;
+        ChatMessage.create({
+          speaker: ChatMessage.getSpeaker({ actor }),
+          content: `${statMap[actionId]}: ${statValue}`,
+          rollMode,
+        });
+      }
     }
-    await roll.toMessage({
-      speaker: ChatMessage.getSpeaker({ actor }),
-      flavor: `Number Appearing (${range})`,
-      rollMode,
-    });
-  } else {
-    const statMap = {
-      xp: "XP",
-      treasureType: "Treasure Type",
-      alignment: "Alignment",
-      size: "Size",
-      type: "Type",
-      intelligence: "Intelligence",
-    };
-    const statValue = actor.system[actionId === "intelligence" ? "monsterINT" : actionId].value;
-    ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({ actor }),
-      content: `${statMap[actionId]}: ${statValue}`,
-      rollMode,
-    });
-  }
-}
   }
 
   /**
