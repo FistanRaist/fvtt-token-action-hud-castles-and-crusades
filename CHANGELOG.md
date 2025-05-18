@@ -1,5 +1,8 @@
 # Change Log
 
+## [1.0.5] - 2025-05-18
+- Verified for Foundry v13.
+
 ## [1.0.4] - 2025-05-10
 - Fixed incorrect logic for melee weapon attack modifiers
 
