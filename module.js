@@ -2,7 +2,7 @@
  * @file module.js
  * @description Custom Token Action HUD integration for the Castles & Crusades system.
  * @author FistanRaist
- * @version 1.0.4
+ * @version 1.0.5
  * @license MIT License - See LICENSE file for details
  * @module fvtt-token-action-hud-castles-and-crusades
  * @requires token-action-hud-core@2.0

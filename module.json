@@ -2,13 +2,13 @@
     "id": "fvtt-token-action-hud-castles-and-crusades",
     "title": "Token Action HUD Castles & Crusades",
     "description": "TAH addon for Castles & Crusades ruleset",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "authors": {
       "name": "FistanRaist"
     },
     "compatibility": {
       "minimum": "12",
-      "verified": "12"
+      "verified": "13"
     },
     "relationships": {
       "systems": [{ "id": "castles-and-crusades", "type": "system", "compatibility": { "minimum": "1.0.4" } }],
